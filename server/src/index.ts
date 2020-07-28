@@ -1,5 +1,6 @@
 import express from "express";
 import expressWs from "express-ws";
+import cors from "cors";
 import WebSocket from "ws";
 
 const app = expressWs(express()).app;
@@ -15,7 +16,8 @@ app.get("/poll", (req, res) => {
     res.status(400).send("This is a websocket endpoint").end();
 })
 
-app.use(express.json())
+app.use(cors());
+app.use(express.json());
 app.post("/annoy", (req, res) => {
     if (!req.body?.len)
         return res.sendStatus(400);
@@ -33,5 +35,7 @@ app.post("/annoy", (req, res) => {
 
     return res.sendStatus(200);
 })
+
+app.use(express.static("./public"));
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
