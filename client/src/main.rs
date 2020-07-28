@@ -1,0 +1,50 @@
+use std::panic;
+use rust_pigpio::{self as pigpio, OUTPUT, OFF, ON};
+use ws;
+
+const PIEZO_PIN: u32 = 23;
+const ONE_SECOND: u32 = 1000000;
+fn run() -> Result<(), String> {
+    pigpio::set_mode(PIEZO_PIN, OUTPUT)?;
+
+    loop {
+        match ws::connect("wss://wakemeup.its-em.ma/poll", |_sender| {
+            move |msg: ws::Message| {
+                let msg = msg.as_text()?;
+
+                let len: u32 = match msg.parse() {
+                    Ok(x) => x,
+                    Err(..) => {
+                        eprintln!("Invalid len: {}", msg);
+                        return Ok(())
+                    }
+                };
+
+                let len = std::cmp::min(len, 10);
+                for _ in 0..len {
+                    pigpio::write(PIEZO_PIN, ON).unwrap();
+                    pigpio::delay(ONE_SECOND);
+                    pigpio::write(PIEZO_PIN, OFF).unwrap();
+                    pigpio::delay(ONE_SECOND / 10);
+                }
+
+                Ok(())
+            }
+        }) {
+            Ok(()) => (),
+            Err(e) => eprintln!("WS Error: {}", e)
+        }
+    }
+}
+
+fn main() -> Result<(), String> {
+    pigpio::initialize()?;
+
+    panic::catch_unwind(|| match run() {
+        Ok(()) => (),
+        Err(e) => eprintln!("{}", e)
+    }).ok();
+    pigpio::terminate();
+
+    Ok(())
+}

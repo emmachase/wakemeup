@@ -1,0 +1,17 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Emma",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.7",
+    "@types/express-ws": "^3.0.0",
+    "@types/node": "^14.0.26"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "ws": "^7.3.1"
+  }
+}
