@@ -1,11 +1,14 @@
 use std::panic;
-use rust_pigpio::{self as pigpio, OUTPUT, OFF, ON};
+use rust_pigpio::{self as pigpio, pwm::*, OUTPUT, OFF, ON};
 use ws;
 
 const PIEZO_PIN: u32 = 23;
 const ONE_SECOND: u32 = 1000000;
 fn run() -> Result<(), String> {
     pigpio::set_mode(PIEZO_PIN, OUTPUT)?;
+
+    set_pwm_frequency(PIEZO_PIN, 500).unwrap();
+    set_pwm_range(PIEZO_PIN, 1000).unwrap();
 
     loop {
         match ws::connect("wss://wakemeup.its-em.ma/poll", |_sender| {
@@ -22,7 +25,7 @@ fn run() -> Result<(), String> {
 
                 let len = std::cmp::min(len, 10);
                 for _ in 0..len {
-                    pigpio::write(PIEZO_PIN, ON).unwrap();
+                    pwm(PIEZO_PIN, 500).unwrap();
                     pigpio::delay(ONE_SECOND);
                     pigpio::write(PIEZO_PIN, OFF).unwrap();
                     pigpio::delay(ONE_SECOND / 10);

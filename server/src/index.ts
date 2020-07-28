@@ -11,6 +11,10 @@ app.ws("/poll", (ws) => {
     clients.push(ws);
 });
 
+app.get("/poll", (req, res) => {
+    res.status(400).send("This is a websocket endpoint").end();
+})
+
 app.use(express.json())
 app.post("/annoy", (req, res) => {
     if (!req.body?.len)
