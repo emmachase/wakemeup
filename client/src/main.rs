@@ -1,5 +1,5 @@
 use std::panic;
-use rust_pigpio::{self as pigpio, pwm::*, OUTPUT, OFF, ON};
+use rust_pigpio::{self as pigpio, pwm::*, OUTPUT, OFF};
 use ws;
 
 const PIEZO_PIN: u32 = 23;
@@ -24,11 +24,11 @@ fn run() -> Result<(), String> {
                 };
 
                 let len = std::cmp::min(len, 10);
-                for _ in 0..len {
+                for _ in 0..len*5 {
                     pwm(PIEZO_PIN, 500).unwrap();
-                    pigpio::delay(ONE_SECOND);
+                    pigpio::delay(ONE_SECOND / 5);
                     pigpio::write(PIEZO_PIN, OFF).unwrap();
-                    pigpio::delay(ONE_SECOND / 10);
+                    pigpio::delay(ONE_SECOND / 5 / 10);
                 }
 
                 Ok(())
